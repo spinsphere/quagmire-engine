@@ -1,12 +1,13 @@
 # Quagmire Engine
 
 A small, deterministic quantum-state engine for games and educational simulations.
-Built for the *Testing Reality* app; designed to be split into its own repository.
+Built for the [*Testing Reality*](https://github.com/spinsphere/testing-reality) app, which
+uses this repository as a git submodule; the engine itself knows nothing about any host.
 
 ```
 core/        quagmire-core   pure Rust library (no engine dependencies)
 sdk-godot/   quagmire-godot  GDExtension for Godot 4.7 (godot-rust gdext)
-docs/        design notes and the physics conventions
+docs/        design notes, physics conventions and how a host project consumes the engine
 ```
 
 ## Model

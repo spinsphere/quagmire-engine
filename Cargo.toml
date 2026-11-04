@@ -7,7 +7,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 authors = ["Testing Reality project"]
-repository = "https://github.com/soliax/testing-reality"
+repository = "https://github.com/spinsphere/quagmire-engine"
 
 [profile.release]
 opt-level = 3
