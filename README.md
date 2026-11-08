@@ -1,7 +1,7 @@
 # Quagmire Engine
 
 A small, deterministic quantum-state engine for games and educational simulations.
-Built for the [*Testing Reality*](https://github.com/spinsphere/testing-reality) app, which
+Built for the Testing Reality and Quagmire Academy apps, which
 uses this repository as a git submodule; the engine itself knows nothing about any host.
 
 ```
