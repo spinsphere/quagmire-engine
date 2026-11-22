@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build the Quagmire Godot SDK for one target and print the path of the resulting library.
-#   sdk-godot/build.sh <linux|windows|web> [release|debug]
+#   sdk-godot/build.sh <linux|windows|web|android> [release|debug]
 # This script belongs to the engine (it knows nothing about any host project); a host copies
 # the printed file into its addon folder (Testing Reality: tools/build-sdk.sh).
 #
@@ -12,9 +12,13 @@
 #          `rustup target add wasm32-unknown-emscripten --toolchain nightly`) and the
 #          Emscripten version Godot's web templates were built with — 4.0.20 for Godot 4.7.2
 #          (`~/emsdk`, or EMSDK=/path). The flags live in ../.cargo/config.toml.
+# android  aarch64-linux-android (arm64-v8a) with the Android NDK's clang as linker:
+#          `rustup target add aarch64-linux-android` and an NDK (r25+) at
+#          ANDROID_NDK_HOME, or the newest one under ANDROID_HOME/ndk (~/Android/Sdk).
+#          Linked with 16 KB page alignment (Google Play requirement from 2025).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-TARGET="${1:?target: linux | windows | web}"
+TARGET="${1:?target: linux | windows | web | android}"
 PROFILE="${2:-release}"
 export PATH="$HOME/.cargo/bin:$PATH"
 FLAG=""; [ "$PROFILE" = "release" ] && FLAG="--release"
@@ -40,5 +44,16 @@ case "$TARGET" in
     rustup run nightly rustc --version >/dev/null 2>&1 || { echo "nightly Rust not installed (rustup toolchain install nightly -c rust-src)" >&2; exit 3; }
     cargo +nightly build -p quagmire-godot $FLAG --features web-nothreads -Zbuild-std=std,panic_abort --target wasm32-unknown-emscripten >&2
     echo "$PWD/target/wasm32-unknown-emscripten/$PROFILE/quagmire_godot.wasm" ;;
+  android)
+    rustup target list --installed | grep -q aarch64-linux-android || { echo "rustup target aarch64-linux-android not installed" >&2; exit 3; }
+    NDK="${ANDROID_NDK_HOME:-}"
+    if [ -z "$NDK" ]; then
+      SDK="${ANDROID_HOME:-$HOME/Android/Sdk}"
+      NDK="$(ls -d "$SDK"/ndk/* 2>/dev/null | sort -V | tail -1 || true)"
+    fi
+    CLANG="$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang"
+    [ -x "$CLANG" ] || { echo "Android NDK not found (set ANDROID_NDK_HOME; looked for $CLANG)" >&2; exit 3; }
+    CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$CLANG" cargo build -p quagmire-godot $FLAG --target aarch64-linux-android >&2
+    echo "$PWD/target/aarch64-linux-android/$PROFILE/libquagmire_godot.so" ;;
   *) echo "unknown target $TARGET" >&2; exit 2 ;;
 esac

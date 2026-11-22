@@ -80,7 +80,7 @@ sdk-c (planned)      C ABI (opaque handles, caller-allocated buffers) for Unity 
 
 Everything platform-specific belongs to an SDK, never to the core: the core is what makes a
 new host cheap, the SDK is what makes it idiomatic. The Godot SDK's own build script
-`sdk-godot/build.sh <linux|windows|web> [release|debug]` prints the artifact for one target;
+`sdk-godot/build.sh <linux|windows|web|android> [release|debug]` prints the artifact for one target;
 host projects copy it where their engine expects it (Testing Reality: `tools/build-sdk.sh`).
 
 | Godot target | Toolchain | Artifact |
@@ -89,6 +89,7 @@ host projects copy it where their engine expects it (Testing Reality: `tools/bui
 | Windows x86_64 | stable Rust, `x86_64-pc-windows-gnu`, mingw-w64 | `quagmire_godot.dll` |
 | macOS | stable Rust on a Mac (not built here) | `libquagmire_godot.dylib` |
 | **Web** (wasm32, Emscripten) | nightly Rust + `rust-src`, Emscripten **matching Godot's templates** (4.0.20 for 4.7.2) | `quagmire_godot.wasm` |
+| Android arm64-v8a | stable Rust, `aarch64-linux-android`, an Android NDK (r25+) as linker; linked with 16 KB pages | `libquagmire_godot.so` |
 
 Web notes:
 
